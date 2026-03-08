@@ -8,7 +8,7 @@
 
 ### Release
 
-本仓库的`Release`中已经存放好打包的apk，可以直接下载
+本仓库的`Release`中已经存放好打包的apk，可供直接下载
 
 ### 自编译
 
@@ -30,6 +30,6 @@
 
 本程序使用GNU GPLv3协议，如果有bug或者建议，欢迎提出issue
 
-欢迎star，祝使用愉快
+欢迎star，祝使用愉快(=^▽^=)
 
 [![Star History Chart](https://api.star-history.com/image?repos=windows99-hue/luanmzweekli&type=date&legend=top-left)](https://www.star-history.com/?repos=windows99-hue%2Fluanmzweekli&type=date&legend=top-left)
