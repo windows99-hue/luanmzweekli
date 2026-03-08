@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#2196F3">
+    <title>周数追踪器</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2196F3;
+            --primary-dark: #1976D2;
+            --primary-light: #E3F2FD;
+            --secondary-color: #FF9800;
+            --text-primary: #212121;
+            --text-secondary: #757575;
+            --background: #f5f7fa;
+            --surface: #ffffff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --border-radius: 16px;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--text-primary);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .content {
+            padding: 30px 25px;
+        }
+
+        .date-section {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 2px dashed #e0e0e0;
+        }
+
+        .current-date {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .current-time {
+            font-size: 16px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .week-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary-light), #e8f4fd);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(33, 150, 243, 0.1);
+        }
+
+        .week-number {
+            text-align: center;
+        }
+
+        .week-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .week-value {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--primary-color);
+            line-height: 1;
+        }
+
+        .week-divider {
+            width: 2px;
+            height: 60px;
+            background: linear-gradient(to bottom, transparent, var(--primary-color), transparent);
+            margin: 0 20px;
+        }
+
+        .day-of-week {
+            text-align: center;
+        }
+
+        .day-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .day-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--secondary-color);
+            line-height: 1;
+        }
+
+        .info-section {
+            background: var(--background);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .info-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-title i {
+            margin-right: 8px;
+            color: var(--primary-color);
+        }
+
+        .info-list {
+            list-style: none;
+        }
+
+        .info-list li {
+            font-size: 14px;
+            color: var(--text-secondary);
+            padding: 6px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-list li:before {
+            content: "•";
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .date-picker-section {
+            background: var(--background);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .date-picker-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .date-picker-title i {
+            margin-right: 8px;
+            color: var(--primary-color);
+        }
+
+        .date-input-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #baseDateInput {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        #saveBaseDate {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #saveBaseDate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+        }
+
+        .current-base-date {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--background);
+            color: var(--text-primary);
+            border: 2px solid #e0e0e0;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: white;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .update-info {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--primary-light);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 480px) {
+            .header {
+                padding: 25px 15px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .content {
+                padding: 20px 15px;
+            }
+            
+            .week-info {
+                padding: 20px;
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .week-divider {
+                width: 60px;
+                height: 2px;
+                margin: 10px 0;
+            }
+            
+            .week-value {
+                font-size: 42px;
+            }
+            
+            .day-value {
+                font-size: 32px;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+        }
+
+        /* 添加到主屏幕提示 */
+        .install-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: none;
+            z-index: 1000;
+            max-width: 90%;
+            width: 400px;
+        }
+
+        .install-prompt.show {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 加载动画 -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="container">
+        <!-- 主卡片 -->
+        <div class="card">
+            <!-- 头部 -->
+            <div class="header">
+                <h1>📅 周数追踪器</h1>
+                <p>由Luanmz07和99编写的周历</p>
+				<p>轻松查看每周进度</p>
+            </div>
+
+            <!-- 内容区域 -->
+            <div class="content">
+                <!-- 日期显示 -->
+                <div class="date-section">
+                    <div class="current-date" id="currentDate">正在加载日期...</div>
+                    <div class="current-time" id="currentTime"></div>
+                </div>
+
+                <!-- 周数信息 -->
+                <div class="week-info">
+                    <div class="week-number">
+                        <div class="week-label">当前周数</div>
+                        <div class="week-value" id="weekNumber">1</div>
+                    </div>
+                    <div class="week-divider"></div>
+                    <div class="day-of-week">
+                        <div class="day-label">星期</div>
+                        <div class="day-value" id="dayOfWeek">一</div>
+                    </div>
+                </div>
+
+                <!-- 日期选择器 -->
+                <div class="date-picker-section">
+                    <div class="date-picker-title">
+                        📅 选择起始日期
+                    </div>
+                    <div class="date-input-container">
+                        <input type="date" id="baseDateInput">
+                        <button id="saveBaseDate" onclick="saveBaseDate()">保存</button>
+                    </div>
+                    <div class="current-base-date" id="currentBaseDate">
+                        当前基准日期：2025年9月1日（周一）
+                    </div>
+                </div>
+
+                <!-- 信息说明 -->
+                <div class="info-section">
+                    <div class="info-title">
+                        📋 计算规则说明
+                    </div>
+                    <ul class="info-list">
+                        <li id="baseDateRule">基准日期：2025年9月1日（周一）</li>
+                        <li id="weekRangeRule">2025.9.1 - 2025.9.7 为第1周</li>
+                        <li>每周从周一开始计算</li>
+                        <li>周数依次递增，永不停歇</li>
+			<li>卡琳爽卡琳爽卡琳爽！</li>
+                    </ul>
+                </div>
+
+                <!-- 操作按钮 -->
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="refreshData()">
+                        🔄 刷新数据
+                    </button>
+                    <button class="btn btn-secondary" onclick="showDetailInfo()">
+                        ℹ️ 详细说明
+                    </button>
+                </div>
+
+                <!-- 更新时间 -->
+                <div class="update-info" id="updateInfo">
+                    最后更新：刚刚
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加到主屏幕提示 -->
+    <div class="install-prompt" id="installPrompt">
+        <p><strong>✨ 添加到主屏幕使用更便捷！</strong></p>
+        <p style="font-size: 14px; margin: 10px 0;">点击分享按钮，然后选择"添加到主屏幕"</p>
+        <button class="btn btn-primary" onclick="hideInstallPrompt()" style="width: 100%;">
+            知道了
+        </button>
+    </div>
+
+    <script>
+        // 从localStorage读取基准日期，如果没有则使用默认值
+        function getBaseDate() {
+            const savedDate = localStorage.getItem('baseDate');
+            if (savedDate) {
+                return new Date(savedDate);
+            }
+            // 默认基准日期：2025年9月1日（周一）
+            return new Date(2025, 8, 1); // 月份从0开始，9月是8
+        }
+
+        // 全局变量
+        let BASE_DATE = getBaseDate();
+        
+        // 星期几的中文名称
+        const DAY_NAMES = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+        
+        // 全局变量
+        let lastUpdateTime = new Date();
+        
+        // 页面加载完成时执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 显示加载动画
+            document.getElementById('loading').style.display = 'flex';
+            
+            // 延迟执行以确保动画显示
+            setTimeout(() => {
+                // 初始化数据
+                updateAllData();
+                
+                // 更新基准日期显示
+                updateBaseDateDisplay();
+                
+                // 隐藏加载动画
+                document.getElementById('loading').style.display = 'none';
+                
+                // 检查是否应该显示添加到主屏幕提示
+                checkInstallPrompt();
+                
+                // 设置自动刷新（每分钟一次）
+                setInterval(updateAllData, 60000);
+                
+                // 更新时间显示（每秒一次）
+                setInterval(updateTime, 1000);
+            }, 500);
+        });
+        
+        // 保存基准日期
+        function saveBaseDate() {
+            const dateInput = document.getElementById('baseDateInput');
+            const selectedDate = dateInput.value;
+            
+            if (!selectedDate) {
+                alert('请选择一个日期');
+                return;
+            }
+            
+            // 转换为Date对象
+            const newBaseDate = new Date(selectedDate);
+            
+            // 保存到localStorage
+            localStorage.setItem('baseDate', newBaseDate.toISOString());
+            
+            // 更新全局变量
+            BASE_DATE = newBaseDate;
+            
+            // 更新显示
+            updateBaseDateDisplay();
+            updateAllData();
+            
+            // 显示成功提示
+            alert('基准日期已保存！');
+        }
+        
+        // 更新基准日期显示
+        function updateBaseDateDisplay() {
+            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+            const baseDateStr = BASE_DATE.toLocaleDateString('zh-CN', options);
+            
+            // 更新当前基准日期显示
+            document.getElementById('currentBaseDate').textContent = `当前基准日期：${baseDateStr}`;
+            
+            // 更新计算规则说明
+            document.getElementById('baseDateRule').textContent = `基准日期：${baseDateStr}`;
+            
+            // 计算第一周的结束日期
+            const firstWeekEnd = new Date(BASE_DATE);
+            firstWeekEnd.setDate(BASE_DATE.getDate() + 6);
+            const firstWeekEndStr = firstWeekEnd.toLocaleDateString('zh-CN', { year: 'numeric', month: 'numeric', day: 'numeric' });
+            const baseDateShortStr = BASE_DATE.toLocaleDateString('zh-CN', { year: 'numeric', month: 'numeric', day: 'numeric' });
+            document.getElementById('weekRangeRule').textContent = `${baseDateShortStr} - ${firstWeekEndStr} 为第1周`;
+        }
+        
+        // 计算周数和星期几
+        function calculateWeekInfo(currentDate) {
+            // 确保使用本地时间
+            const now = new Date(currentDate);
+            
+            // 计算与基准日期的天数差
+            const timeDiff = now.getTime() - BASE_DATE.getTime();
+            const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+            
+            // 如果日期在基准日期之前，返回0周
+            if (daysDiff < 0) {
+                return {
+                    weekNumber: 0,
+                    dayOfWeek: '基准日期前',
+                    daysDiff: daysDiff
+                };
+            }
+            
+            // 计算周数（从第1周开始）
+            const weekNumber = Math.floor(daysDiff / 7) + 1;
+            
+            // 计算星期几（0=周一, 1=周二, ..., 6=周日）
+            const dayIndex = daysDiff % 7;
+            const dayOfWeek = DAY_NAMES[dayIndex];
+            
+            return {
+                weekNumber: weekNumber,
+                dayOfWeek: dayOfWeek,
+                daysDiff: daysDiff
+            };
+        }
+        
+        // 更新所有数据
+        function updateAllData() {
+            const now = new Date();
+            const weekInfo = calculateWeekInfo(now);
+            
+            // 更新日期显示
+            updateDateDisplay(now);
+            
+            // 更新周数显示
+            updateWeekDisplay(weekInfo);
+            
+            // 更新时间显示
+            updateTime();
+            
+            // 更新最后更新时间
+            lastUpdateTime = new Date();
+            updateLastUpdateTime();
+            
+            // 可选：如果日期变化，有特殊效果
+            checkSpecialDay(weekInfo);
+        }
+        
+        // 更新日期显示
+        function updateDateDisplay(date) {
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                weekday: 'long'
+            };
+            
+            const dateStr = date.toLocaleDateString('zh-CN', options);
+            document.getElementById('currentDate').textContent = dateStr;
+        }
+        
+        // 更新时间显示
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('zh-CN', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('currentTime').textContent = timeStr;
+        }
+        
+        // 更新周数显示
+        function updateWeekDisplay(weekInfo) {
+            document.getElementById('weekNumber').textContent = weekInfo.weekNumber;
+            document.getElementById('dayOfWeek').textContent = weekInfo.dayOfWeek;
+        }
+        
+        // 更新最后更新时间
+        function updateLastUpdateTime() {
+            const now = new Date();
+            const diff = Math.floor((now - lastUpdateTime) / 1000); // 秒数差
+            
+            let timeText = '刚刚';
+            
+            if (diff >= 60) {
+                const minutes = Math.floor(diff / 60);
+                timeText = `${minutes}分钟前`;
+            }
+            
+            document.getElementById('updateInfo').textContent = `最后更新：${timeText}`;
+        }
+        
+        // 检查特殊日期
+        function checkSpecialDay(weekInfo) {
+            const weekNumberEl = document.getElementById('weekNumber');
+            const dayOfWeekEl = document.getElementById('dayOfWeek');
+            
+            // 移除之前的特殊样式
+            weekNumberEl.style.color = '';
+            dayOfWeekEl.style.color = '';
+            weekNumberEl.style.transform = '';
+            dayOfWeekEl.style.transform = '';
+            
+            // 如果是周一，有特殊效果
+            if (weekInfo.dayOfWeek === '周一') {
+                weekNumberEl.style.color = '#FF5722';
+                weekNumberEl.style.transform = 'scale(1.1)';
+                
+                setTimeout(() => {
+                    weekNumberEl.style.transform = 'scale(1)';
+                }, 300);
+            }
+            
+            // 如果是周末，有特殊效果
+            if (weekInfo.dayOfWeek === '周六' || weekInfo.dayOfWeek === '周日') {
+                dayOfWeekEl.style.color = '#4CAF50';
+            }
+        }
+        
+        // 刷新数据按钮点击事件
+        function refreshData() {
+            // 显示加载动画
+            document.getElementById('loading').style.display = 'flex';
+            
+            // 添加按钮点击效果
+            const btn = event.target.closest('.btn');
+            if (btn) {
+                btn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    btn.style.transform = '';
+                }, 200);
+            }
+            
+            // 延迟更新，让动画可见
+            setTimeout(() => {
+                updateAllData();
+                document.getElementById('loading').style.display = 'none';
+            }, 300);
+        }
+        
+        // 显示详细说明
+        function showDetailInfo() {
+            const weekInfo = calculateWeekInfo(new Date());
+            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+            const baseDateStr = BASE_DATE.toLocaleDateString('zh-CN', options);
+            const detailMsg = `
+周数计算详情：
+• 今天是第 ${weekInfo.weekNumber} 周
+• 今天是 ${weekInfo.dayOfWeek}
+• 距离基准日期已经过去 ${weekInfo.daysDiff} 天
+• 基准日期：${baseDateStr}
+            `.trim();
+            
+            alert(detailMsg);
+        }
+        
+        // 检查是否显示添加到主屏幕提示
+        function checkInstallPrompt() {
+            // 检查是否是在移动设备上
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            
+            // 检查是否已经添加到主屏幕
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+            
+            // 如果是移动设备且没有独立运行，显示提示
+            if (isMobile && !isStandalone) {
+                // 检查是否之前已经显示过
+                const hasShownPrompt = localStorage.getItem('installPromptShown');
+                
+                if (!hasShownPrompt) {
+                    // 延迟显示提示
+                    setTimeout(() => {
+                        document.getElementById('installPrompt').classList.add('show');
+                        localStorage.setItem('installPromptShown', 'true');
+                    }, 3000);
+                }
+            }
+        }
+        
+        // 隐藏添加到主屏幕提示
+        function hideInstallPrompt() {
+            document.getElementById('installPrompt').classList.remove('show');
+        }
+        
+        // 添加到主屏幕功能
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // 阻止浏览器默认的安装提示
+            e.preventDefault();
+            // 保存事件，以便后续使用
+            deferredPrompt = e;
+            
+            // 显示自定义的安装提示
+            showInstallButton();
+        });
+        
+        function showInstallButton() {
+            // 可以在这里显示一个安装按钮
+            console.log('可以安装为PWA应用');
+        }
+        
+        // 离线支持
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(err => {
+                    console.log('ServiceWorker 注册失败:', err);
+                });
+            });
+        }
+    </script>
+</body>
+</html>
